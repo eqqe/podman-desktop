@@ -608,9 +608,7 @@ describe.each([
   );
 
   test('verify error contains name, message and stderr if creation fails', async () => {
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
     vi.mocked(extensionApi.process.exec).mockRejectedValueOnce({
       name: 'name',
       message: 'description',
@@ -634,9 +632,7 @@ describe.each([
     vi.mocked(extensionApi.env).isMac = true;
     vi.mocked(getAssetsFolder).mockReturnValue('fake');
     vi.mocked(fs.existsSync).mockReturnValue(true);
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     await extension.createMachine(
       {
@@ -670,9 +666,7 @@ describe.each([
     vi.mocked(getAssetsFolder).mockReturnValue('fake');
     vi.mocked(fs.existsSync).mockReturnValue(true);
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     await extension.createMachine(
       {
@@ -1652,9 +1646,7 @@ describe('initCheckAndRegisterUpdate', () => {
       bundledVersion: '5.0',
     });
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     // check again the update
     await initCheckAndRegisterUpdate(provider, podmanInstall);
@@ -1838,9 +1830,7 @@ describe('registerOnboardingMachineExistsCommand', () => {
     vi.mocked(extensionApi.commands.registerCommand).mockReturnValue({ dispose: vi.fn() });
 
     // return an empty object for the first call
-    vi.spyOn(extensionApi.process, 'exec').mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
     // return 2 empty machines for the second call
     vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
       stdout: '[{}, {}]',
@@ -1903,9 +1893,7 @@ describe('registerOnboardingUnsupportedPodmanMachineCommand', () => {
 
     vi.mocked(extensionApi.commands.registerCommand).mockReturnValue({ dispose: vi.fn() });
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     // second call to get the machine list
     vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
@@ -1941,9 +1929,7 @@ describe('registerOnboardingUnsupportedPodmanMachineCommand', () => {
     vi.mocked(extensionApi.commands.registerCommand).mockReturnValue({ dispose: vi.fn() });
 
     // first call to get the podman version
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     // second call to get the machine list
     vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
@@ -2019,9 +2005,7 @@ describe('registerOnboardingUnsupportedPodmanMachineCommand', () => {
     vi.mocked(extensionApi.commands.registerCommand).mockReturnValue({ dispose: vi.fn() });
 
     // first call to get the podman version
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     // second call to get the machine list
     vi.mocked(extensionApi.process.exec).mockRejectedValue({
@@ -2060,9 +2044,7 @@ describe('registerOnboardingRemoveUnsupportedMachinesCommand', () => {
 
     vi.mocked(extensionApi.commands.registerCommand).mockReturnValue({ dispose: vi.fn() });
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
       stdout: '[]',
@@ -2103,13 +2085,9 @@ describe('registerOnboardingRemoveUnsupportedMachinesCommand', () => {
 
     vi.mocked(extensionApi.commands.registerCommand).mockReturnValue({ dispose: vi.fn() });
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
     // two times false (no qemu folders)
     vi.mocked(fs.existsSync).mockReturnValueOnce(false);
     vi.mocked(fs.existsSync).mockReturnValueOnce(false);
@@ -2161,13 +2139,9 @@ describe('registerOnboardingRemoveUnsupportedMachinesCommand', () => {
 
     vi.mocked(extensionApi.commands.registerCommand).mockReturnValue({ dispose: vi.fn() });
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
       stdout: 'unknown message: 1.2.5.0',
@@ -3458,18 +3432,14 @@ describe('Check notify podman setup', () => {
 
     vi.mocked(extensionApi.commands.registerCommand).mockReturnValue({ dispose: vi.fn() });
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     // second call to get the machine list
     vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
       stdout: '[]',
     } as unknown as extensionApi.RunResult);
 
-    vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
-      stdout: 'podman version 5.0.0',
-    } as unknown as extensionApi.RunResult);
+    mockPodmanV5ExecResult();
 
     await extension.updateMachines(provider, podmanConfiguration);
 
@@ -3483,3 +3453,9 @@ describe('Check notify podman setup', () => {
     });
   });
 });
+
+function mockPodmanV5ExecResult() {
+  vi.mocked(extensionApi.process.exec).mockResolvedValueOnce({
+    stdout: 'podman version 5.0.0',
+  } as unknown as extensionApi.RunResult);
+}
