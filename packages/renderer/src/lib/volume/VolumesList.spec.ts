@@ -33,6 +33,7 @@ import { volumeListInfos, volumesEventStore } from '/@/stores/volumes';
 import type { ProviderInfo } from '/@api/provider-info';
 
 import VolumesList from './VolumesList.svelte';
+import { waitStorePopulated } from './wait-store-populated';
 
 const listVolumesMock = vi.fn();
 const getProviderInfosMock = vi.fn();
@@ -138,11 +139,7 @@ test('Expect volumes being displayed once extensions are started (without size d
   // first call is with listing without details
   expect(listVolumesMock).toHaveBeenNthCalledWith(1, false);
 
-  await waitFor(() => {
-    // wait store are populated
-    expect(get(volumeListInfos)).not.toHaveLength(0);
-    expect(get(providerInfos)).not.toHaveLength(0);
-  });
+  await waitStorePopulated();
 
   await waitRender({});
 
