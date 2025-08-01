@@ -77,11 +77,11 @@ export class ExperimentalFeatureFeedbackHandler {
 
       const conf = this.#configurationRegistry.getConfiguration(firstPart).get(secondPart);
       // Configuration does not exist (feature is not enabled)
-      if (!conf) {
+      if (conf === undefined || conf === null) {
         continue;
       }
 
-      let optionDisabled = false;
+      let optionDisabled = conf === false;
       let optionRemindAt: Timestamp = undefined;
       if (typeof conf === 'object' && 'disabled' in conf && 'remindAt' in conf) {
         if (typeof conf.disabled === 'boolean') optionDisabled = conf.disabled;
@@ -97,7 +97,7 @@ export class ExperimentalFeatureFeedbackHandler {
         this.experimentalFeatures.set(configurationKey, configuration);
       } else {
         // when started for first time, we need to set the timetamps for each experimental feature
-        this.setReminder(configurationKey);
+        this.setReminder(configurationKey, optionDisabled);
       }
     }
     // When are all features set, show dialog
@@ -108,14 +108,13 @@ export class ExperimentalFeatureFeedbackHandler {
    * @param feature in format feature.name
    * @param days timeout in days, undefined -> disabled, 'disabled' -> "Don't show again" was selected
    */
-  protected setTimestamp(feature: string, days: Timestamp): void {
+  protected setTimestamp(feature: string, days: Timestamp, optionDisabled: boolean): void {
     let date: Timestamp = days;
     if (typeof days === 'number') {
       date = new Date(new Date().getTime() + days * DAYS_TO_MS).getTime();
     }
     // update configuration
-    const conf = this.experimentalFeatures.get(feature);
-    this.experimentalFeatures.set(feature, { remindAt: date, disabled: conf ? conf.disabled : false });
+    this.experimentalFeatures.set(feature, { remindAt: date, disabled: optionDisabled });
     this.save(feature).catch((e: unknown) =>
       console.error(`Got error when saving timestamps for experimental features: ${e}`),
     );
@@ -125,12 +124,12 @@ export class ExperimentalFeatureFeedbackHandler {
    * Decides which value should be used for setting timestamp of given feature
    * @param configurationName in format feature.name
    */
-  protected setReminder(configurationName: string): void {
+  protected setReminder(configurationName: string, optionDisabled: boolean): void {
     const splittedName = configurationName.split('.');
     if (splittedName.length >= 2 && splittedName[1]) {
       const configurationValue = this.#configurationRegistry.getConfiguration(splittedName[0]).get(splittedName[1]);
-      if (configurationValue) this.setTimestamp(configurationName, 2);
-      else this.setTimestamp(configurationName, undefined);
+      if (configurationValue) this.setTimestamp(configurationName, 2, optionDisabled);
+      else this.setTimestamp(configurationName, undefined, optionDisabled);
     }
   }
 
